@@ -1,8 +1,6 @@
 name: Terraform Apply or Destroy RDS
 
 on:
-  push:
-    
   workflow_dispatch:
     inputs:
       deployment:
@@ -25,7 +23,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./testing
+        working-directory: ./deployment
 
     steps:
       - name: Checkout Repository
