@@ -1,0 +1,53 @@
+name: Terraform Apply or Destroy RDS
+
+on:
+  push:
+    
+  workflow_dispatch:
+    inputs:
+      deployment:
+        type: choice
+        description: DeployOrTearDown
+        options:
+          - Apply
+          - Destroy
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+#   DB_USERNAME: ${{ secrets.DB_USERNAME }}
+#   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./testing
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: init
+        run: terraform init
+
+      - name: validate
+        run: terraform validate
+
+      - name: plan
+        run: terraform plan
+
+      - name: apply or destroy
+        run: |
+          if [ ${{ github.event.inputs.deployment }} == 'Apply' ]; then  
+            terraform apply -auto-approve
+          elif [ ${{ github.event.inputs.deployment }} == 'Destroy' ]; then  
+            terraform destroy -auto-approve
+          fi
+        shell: bash
