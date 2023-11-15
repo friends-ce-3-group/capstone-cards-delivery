@@ -25,7 +25,7 @@ resource "local_file" "pycode" {
   filename = "${path.module}/${local.lambda_handler_function}.py"
 
   depends_on = [
-    aws_sns_topic.lambda_hello_world
+    aws_sns_topic.notification
   ]
 }
 
