@@ -1,5 +1,14 @@
+locals {
+  sns_tag = "${var.resource_grp_name}-sns"
+}
+
 resource "aws_sns_topic" "notification" {
-  name = "${var.resource_grp_name}-sns"
+  name = local.sns_tag
+
+  tags = {
+    name = local.sns_tag
+    proj_name = var.proj_name
+  }
 }
 
 resource "aws_sns_topic_subscription" "notification" {
