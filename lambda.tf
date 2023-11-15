@@ -15,7 +15,7 @@ data "template_file" "lambda_template" {
   template = file("${path.module}/lambda_handler.py")
   vars = {
     lambda_handler_function = local.lambda_handler_function
-    sns_topic_arn = aws_sns_topic.lambda_hello_world.arn
+    sns_topic_arn = aws_sns_topic.notification.arn
   }
 }
 
