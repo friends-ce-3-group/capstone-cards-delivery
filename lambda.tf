@@ -5,7 +5,8 @@
 
 
 locals {
-  lambda_handler_function = "${var.resource_grp_name}_lambda" # name the lambda function
+  resource_grp_name_underscore = replace(var.resource_grp_name, "-", "_")
+  lambda_handler_function = "${local.resource_grp_name_underscore}_lambda" # name the lambda function
   source_file = "${path.module}/${local.lambda_handler_function}.py" # the py file created
   zip_file = "${path.module}/${local.lambda_handler_function}.zip" # the zip file created
 }

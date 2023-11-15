@@ -8,11 +8,34 @@
 
 # IAM policy document json ----part of----> IAM policy ----attach to----> IAM role
 
+
+# A1. generate the policy doc to allow SNS publishing
+# A2. create a new policy and attach the SNS publishing policy doc json to it
+# A3. attach the new policy to the IAM role
+
+# B1. generate the policy doc to allow logging from lambda
+# B2. create a new policy and attach the lambda logging policy doc json to it
+# B3. attach the new policy to the IAM role
+
 locals {
   lambda_iam_role = "${var.resource_grp_name}-lambda-role"
   lambda_iam_policy = "${var.resource_grp_name}-lambda-policy"
+  sns_iam_policy = "${var.resource_grp_name}-sns-policy"
 }
 
+# generate a generic trust relationship policy document for lambdas
+data "aws_iam_policy_document" "lambda" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+# the iam role for the lambda function
 resource "aws_iam_role" "lambda_iam_role" {
   name = local.lambda_iam_role
 
@@ -26,22 +49,10 @@ resource "aws_iam_role" "lambda_iam_role" {
   }
 }
 
-# generate a trust relationship policy document for the role
-data "aws_iam_policy_document" "lambda" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
 # Set up permissions for publishing to SNS
 # -----------------------------------------------------------------
 
-# generate the policy doc json for the logging policy
+# A1. generate the policy doc to allow SNS publishing
 data "aws_iam_policy_document" "sns_topic_policy_doc" {
   statement {
     actions   = ["sns:Publish"]
@@ -50,13 +61,18 @@ data "aws_iam_policy_document" "sns_topic_policy_doc" {
   }
 }
 
-# create a new policy and attach the policy doc json to it
+# A2. create a new policy and attach the SNS publishing policy doc json to it
 resource "aws_iam_policy" "sns_topic_policy" {
-  name   = local.lambda_iam_policy
+  name   = local.sns_iam_policy
   policy = data.aws_iam_policy_document.sns_topic_policy_doc.json
+
+  tags = {
+    name = local.sns_iam_policy
+    proj_name = var.proj_name
+  }
 }
 
-# attach the new policy to the IAM role
+# A3. attach the new policy to the IAM role
 resource "aws_iam_role_policy_attachment" "attach_sns_topic" {
   role       = aws_iam_role.lambda_iam_role.name
   policy_arn = aws_iam_policy.sns_topic_policy.arn
@@ -85,7 +101,7 @@ resource "aws_iam_role_policy_attachment" "attach_sns_topic" {
 # Approach 2:: Specify a new policy
 #
 
-# generate the policy doc json for the logging policy
+# B1. generate the policy doc to allow logging from lambda
 data "aws_iam_policy_document" "lambda_logging_policy_doc" {
   statement {
     actions   = [
@@ -98,13 +114,18 @@ data "aws_iam_policy_document" "lambda_logging_policy_doc" {
   }
 }
 
-# create a new policy and attach the policy doc json to it
+# B2. create a new policy and attach the lambda logging policy doc json to it
 resource "aws_iam_policy" "lambda_logging_policy" {
-  name   = "lambda-hello-world-logging"
+  name   = local.lambda_iam_policy
   policy = data.aws_iam_policy_document.lambda_logging_policy_doc.json
+
+  tags = {
+    name = local.lambda_iam_policy
+    proj_name = var.proj_name
+  }
 }
 
-# attach the new policy to the IAM role
+# B3. attach the new policy to the IAM role
 resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
   role       = aws_iam_role.lambda_iam_role.name
   policy_arn = aws_iam_policy.lambda_logging_policy.arn
