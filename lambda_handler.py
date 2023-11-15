@@ -23,9 +23,4 @@ def ${lambda_handler_function}(event, context):
         MessageStructure = 'json'
     )
     
-    json_response = {
-        'statusCode': 200,
-        'body': json.dumps(inputs)
-    }
-
-    return json_response
+    return response
