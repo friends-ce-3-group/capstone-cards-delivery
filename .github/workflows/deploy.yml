@@ -1,4 +1,4 @@
-name: Terraform Apply or Destroy RDS
+name: Terraform Apply or Destroy Notif Svc
 
 on:
   workflow_dispatch:
