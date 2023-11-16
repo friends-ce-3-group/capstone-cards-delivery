@@ -1,4 +1,4 @@
-region = "us-west-2"
+region = "us-east-1"
 
 resource_grp_name = "friends-capstone-notification"
 
