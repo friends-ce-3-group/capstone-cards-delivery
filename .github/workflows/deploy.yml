@@ -1,4 +1,4 @@
-name: Terraform Apply or Destroy Notif Svc
+name: Set up card sending service
 
 on:
   workflow_dispatch:
