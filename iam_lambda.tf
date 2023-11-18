@@ -136,7 +136,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
 #------------------------------------------------------------------------------
 
 locals {
-  s3_bucket_name = split(".", "${S3_BUCKET_IMAGES_URL}")[0]
+  s3_bucket_name = split(".", "#{S3_BUCKET_IMAGES_URL}#")[0]
 }
 
 data "aws_iam_policy_document" "lambda_s3_get_policy_doc" {
