@@ -7,5 +7,9 @@ module "goodreads_notification" {
 
     region = var.region
 
-    environment = var.environment
+}
+
+resource "local_file" "lambda_email_svc_arn" {
+    content     = "LAMBDAARN=${module.goodreads_notification.lambda_email_svc_arn}"
+    filename = "${path.module}/outputs.dat"
 }

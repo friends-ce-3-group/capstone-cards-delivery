@@ -42,7 +42,7 @@ data "archive_file" "lambda_zip" {
 }
 
 locals {
-  lambda_tag = "${var.resource_grp_name}-lambda-${var.environment}"
+  lambda_tag = "${var.resource_grp_name}-lambda"
 }
 
 # 4. create the lambda, load the python code into it, and attach the specific handler function to be run as the primary lambda function
@@ -72,4 +72,8 @@ resource "aws_cloudwatch_log_group" "function_log_group" {
   lifecycle {
     prevent_destroy = false
   }
+}
+
+output lambda_email_svc_arn {
+  value = aws_lambda_function.eventbridge_ses_link.arn
 }

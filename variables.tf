@@ -9,7 +9,3 @@ variable "proj_name" {
 variable "region" {
   type = string
 }
-
-variable "environment" {
-  type = string
-}
