@@ -17,7 +17,7 @@ def sns_trigger(event):
     return response
 
 def s3_bucket_get():
-    s3 = boto3.client('s3', region_name="us-west-2")
+    s3 = boto3.client('s3')
     
     buckets = s3.list_buckets()
 
@@ -30,8 +30,6 @@ def ${lambda_handler_function}(event, context):
 
     print(event["recipientName"])
     print(event["recipientEmail"])
-    print(event["imagePath"])
-    print(event["imagePath"])
     print(event["imagePath"])
 
     s3_bucket_get()
