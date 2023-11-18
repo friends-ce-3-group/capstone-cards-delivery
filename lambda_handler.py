@@ -23,12 +23,12 @@ def s3_bucket_get():
     #    print(bucket["Name"])
 
     s3res = boto3.resource('s3')
-    bucket = s3res.Bucket('friends-capstone-infra-s3-images')
+    bucket = s3res.Bucket('${s3_image_bucket_name}')
     for obj in bucket.objects.all():
         print(obj.key)
         
 
-def friends_capstone_notification_lambda(event, context):
+def ${lambda_handler_function}(event, context):
 
     response = sns_trigger(event)
 
