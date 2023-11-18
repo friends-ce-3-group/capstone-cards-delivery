@@ -29,7 +29,7 @@ jobs:
 
       - uses: cschleiden/replace-tokens@v1
         with:
-          files: '["${{ github.workspace }}/../iam_lambda.tf"]'
+          files: '["${{ github.workspace }}/iam_lambda.tf"]'
         env:
           S3_BUCKET_IMAGES_URL: ${{ vars.S3_BUCKET_IMAGES_URL }}
 
