@@ -59,6 +59,14 @@ resource "aws_lambda_function" "eventbridge_ses_link" {
 
   handler = "${local.lambda_handler_function}.${local.lambda_handler_function}"
 
+  timeout = 180 # 3 mins timeout
+
+  memory_size = 1024 # MB / 1 GB
+
+  ephemeral_storage {
+    size = 3072 # 3 GB
+  }
+
   tags = {
     name    = local.lambda_tag,
     project = "${var.proj_name}"

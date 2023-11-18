@@ -17,23 +17,25 @@ def sns_trigger(event):
     return response
 
 def s3_bucket_get():
-    s3 = boto3.client('s3')
+    #s3 = boto3.client("s3")
     
-    buckets = s3.list_buckets()
+    #for bucket in s3.list_buckets()["Buckets"]:
+    #    print(bucket["Name"])
 
-    print(json.dumps(buckets))
+    s3res = boto3.resource('s3')
+    bucket = s3res.Bucket('friends-capstone-infra-s3-images')
+    for obj in bucket.objects.all():
+        print(obj.key)
+        
 
-
-def ${lambda_handler_function}(event, context):
+def friends_capstone_notification_lambda(event, context):
 
     response = sns_trigger(event)
 
-    print(event["recipientName"])
-    print(event["recipientEmail"])
-    print(event["imagePath"])
+    #print(event["recipientName"])
+    #print(event["recipientEmail"])
+    #print(event["imagePath"])
 
     s3_bucket_get()
 
     return response
-
-
