@@ -14,8 +14,6 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-#   DB_USERNAME: ${{ secrets.DB_USERNAME }}
-#   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
   deploy:
@@ -28,6 +26,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["${{ github.workspace }}/../iam_lambda.tf"]'
+        env:
+          S3_BUCKET_IMAGES_URL: ${{ vars.S3_BUCKET_IMAGES_URL }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
