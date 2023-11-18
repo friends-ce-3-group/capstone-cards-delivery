@@ -54,5 +54,5 @@ resource "aws_iam_role_policy_attachment" "eventbridge_lambda" {
 }
 
 output "eventbrige_trigger_lambda_arn" {
-  value = aws_iam_policy.eventbridge_iam_role.arn
+  value = aws_iam_role.eventbridge_iam_role.arn
 }
