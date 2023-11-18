@@ -56,7 +56,12 @@ jobs:
 
       - name: Update container image tag to use in ECS
         run: |
-          cat outputs.dat
-          source outputs.dat
-          curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $ACCESS_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/orgs/friends-ce-3-group/actions/variables/LAMBDA_ARN_EMAIL_SERVICE -d '{"name":"LAMBDA_ARN_EMAIL_SERVICE","value":"'$LAMBDAARN'","visibility":"all"}'
+          if [ ${{ github.event.inputs.deployment }} == 'Apply' ]; then
+            cat outputs.dat
+            source outputs.dat
+            curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $ACCESS_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/orgs/friends-ce-3-group/actions/variables/LAMBDA_ARN_EMAIL_SERVICE -d '{"name":"LAMBDA_ARN_EMAIL_SERVICE","value":"'$LAMBDAARN'","visibility":"all"}'
+            curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $ACCESS_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/orgs/friends-ce-3-group/actions/variables/EVENTBRIDGELAMDBA_ARN_EMAIL_SERVICE -d '{"name":"EVENTBRIDGELAMDBA_ARN_EMAIL_SERVICE","value":"'$EVENTBRIDGETRIGGERLAMBDAROLEARN'","visibility":"all"}'
+          elif [ ${{ github.event.inputs.deployment }} == 'Destroy' ]; then  
+            curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $ACCESS_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/orgs/friends-ce-3-group/actions/variables/LAMBDA_ARN_EMAIL_SERVICE -d '{"name":"LAMBDA_ARN_EMAIL_SERVICE","value":"'empty'","visibility":"all"}'
+            curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $ACCESS_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/orgs/friends-ce-3-group/actions/variables/EVENTBRIDGELAMDBA_ARN_EMAIL_SERVICE -d '{"name":"EVENTBRIDGELAMDBA_ARN_EMAIL_SERVICE","value":"'empty'","visibility":"all"}'
 
