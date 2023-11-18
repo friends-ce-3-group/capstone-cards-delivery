@@ -142,9 +142,14 @@ locals {
 data "aws_iam_policy_document" "lambda_s3_get_policy_doc" {
   statement {
     actions   = [
-          "s3:GetObject"
+          "s3:GetObject",
+          "s3:GetBucketLocation",
+          "s3:ListBucket"
         ]
-    resources = [ "arn:aws:s3:::${local.s3_bucket_name}/*" ]
+    resources = [ 
+      "arn:aws:s3:::${local.s3_bucket_name}/*",
+      "arn:aws:s3:::${local.s3_bucket_name}"
+    ]
     effect    = "Allow"
   }
 }
