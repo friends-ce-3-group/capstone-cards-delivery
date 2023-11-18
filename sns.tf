@@ -1,5 +1,5 @@
 locals {
-  sns_tag = "${var.resource_grp_name}-sns"
+  sns_tag = "${var.resource_grp_name}-sns-${var.environment}"
 }
 
 resource "aws_sns_topic" "notification" {

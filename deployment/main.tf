@@ -7,4 +7,5 @@ module "goodreads_notification" {
 
     region = var.region
 
+    environment = var.environment
 }

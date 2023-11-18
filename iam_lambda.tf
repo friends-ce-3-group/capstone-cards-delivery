@@ -19,7 +19,8 @@
 
 locals {
   lambda_iam_role = "${var.resource_grp_name}-lambda-role"
-  lambda_iam_policy = "${var.resource_grp_name}-lambda-policy"
+  lambda_iam_logging_policy = "${var.resource_grp_name}-lambda-logging-policy"
+  lambda_iam_s3_get_policy = "${var.resource_grp_name}-lambda-s3-get-policy"
   sns_iam_policy = "${var.resource_grp_name}-sns-policy"
 }
 
@@ -116,11 +117,11 @@ data "aws_iam_policy_document" "lambda_logging_policy_doc" {
 
 # B2. create a new policy and attach the lambda logging policy doc json to it
 resource "aws_iam_policy" "lambda_logging_policy" {
-  name   = local.lambda_iam_policy
+  name   = local.lambda_iam_logging_policy
   policy = data.aws_iam_policy_document.lambda_logging_policy_doc.json
 
   tags = {
-    name = local.lambda_iam_policy
+    name = local.lambda_iam_logging_policy
     proj_name = var.proj_name
   }
 }
@@ -129,4 +130,37 @@ resource "aws_iam_policy" "lambda_logging_policy" {
 resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
   role       = aws_iam_role.lambda_iam_role.name
   policy_arn = aws_iam_policy.lambda_logging_policy.arn
+}
+
+# Set up permissions to reach S3 bucket
+#------------------------------------------------------------------------------
+
+locals {
+  s3_bucket_name = split(".", "${S3_BUCKET_IMAGES_URL}")[0]
+}
+
+data "aws_iam_policy_document" "lambda_s3_get_policy_doc" {
+  statement {
+    actions   = [
+          "s3:GetObject"
+        ]
+    resources = [ "arn:aws:s3:::${local.s3_bucket_name}/*" ]
+    effect    = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "lambda_s3_get_policy" {
+  name   = local.lambda_iam_s3_get_policy
+  policy = data.aws_iam_policy_document.lambda_s3_get_policy_doc.json
+
+  tags = {
+    name = local.lambda_iam_s3_get_policy
+    proj_name = var.proj_name
+  }
+}
+
+
+resource "aws_iam_role_policy_attachment" "attach_s3_get_policy" {
+  role       = aws_iam_role.lambda_iam_role.name
+  policy_arn = aws_iam_policy.lambda_s3_get_policy.arn
 }

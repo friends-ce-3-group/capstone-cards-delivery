@@ -42,7 +42,7 @@ data "archive_file" "lambda_zip" {
 }
 
 locals {
-  lambda_tag = "${var.resource_grp_name}-lambda"
+  lambda_tag = "${var.resource_grp_name}-lambda-${var.environment}"
 }
 
 # 4. create the lambda, load the python code into it, and attach the specific handler function to be run as the primary lambda function
