@@ -111,7 +111,7 @@ def friends_capstone_notification_lambda(event, context):
     if success:
     
         print("Triggering SES")
-        response = send_email(event["recipientEmail"])
+        response = send_email_with_attachment(event["recipientEmail"])
         return response
     
     else:
