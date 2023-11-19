@@ -18,7 +18,7 @@ def sns_trigger(event):
     return response
 
 def s3_bucket_get(image):
-    s3_prefix = "static/css/"
+    s3_prefix = "originals/"
     local_prefix = "/tmp/" # in the lambda filesystem, only this folder is writable
 
     image_path = s3_prefix + image
@@ -27,19 +27,13 @@ def s3_bucket_get(image):
     # notes: 
     # this lambda is in us-east-1, whereas friends-capstone-infra-s3-website is in us-west-2
     # cross-region s3 bucket access works out of the box
-
     bucket_name = '${s3_image_bucket_name}'
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(bucket_name)
-    for obj in bucket.objects.all():
-        print(obj.key)
+    # for obj in bucket.objects.all():
+    #     print(obj.key)
 
-    print(":")
-    print(":")
-    print(":")
-    print("Trying to dl:")
-    
     try:
         bucket.download_file(image_path, local_path)
     except botocore.exceptions.ClientError as err:
@@ -50,13 +44,8 @@ def ${lambda_handler_function}(event, context):
 
     response = sns_trigger(event)
 
-    print("recipientName:", event["recipientName"], "\n")
-    print("recipientEmail", event["recipientEmail"], "\n")
-    print("imagePath:" , event["imagePath"], "\n")
-    print(":")
-    print(":")
-    print(":")
-
     s3_bucket_get(event["imagePath"])
+
+    print(os.listdir("/tmp/"))
 
     return response
