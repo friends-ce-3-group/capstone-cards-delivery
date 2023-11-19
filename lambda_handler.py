@@ -49,15 +49,17 @@ def friends_capstone_notification_lambda(event, context):
     print("recipientName:", event["recipientName"], "\n")
     print("recipientEmail", event["recipientEmail"], "\n")
     print("imagePath:" , event["imagePath"], "\n")
-    print(":")
-    print(":")
-    print(":")
+    
+    print("---------------------------------------------------------")
 
-    s3_bucket_get(event["imagePath"])
-
-    print(":")
-    print(":")
-    print(":")
+    success, msg = s3_bucket_get(event["imagePath"])
     print(os.listdir(CONST_TARGET_PATH_PREFIX))
+
+    print("---------------------------------------------------------")
+
+    if success:
+        print("Triggering SES")
+
+        
 
     return response
