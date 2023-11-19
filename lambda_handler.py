@@ -24,6 +24,10 @@ def s3_bucket_get(image):
     image_path = s3_prefix + image
     local_path = local_prefix + image
 
+    # notes: 
+    # this lambda is in us-east-1, whereas friends-capstone-infra-s3-website is in us-west-2
+    # cross-region s3 bucket access works out of the box
+
     bucket_name = '${s3_image_bucket_name}'
 
     s3 = boto3.resource('s3')
