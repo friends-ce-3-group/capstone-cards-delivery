@@ -21,7 +21,7 @@ locals {
   lambda_iam_role = "${var.resource_grp_name}-lambda-role"
   lambda_iam_logging_policy = "${var.resource_grp_name}-lambda-logging-policy"
   lambda_iam_s3_get_policy = "${var.resource_grp_name}-lambda-s3-get-policy"
-  lambda_iam_ses_policy = "${var.resource_grp_name}-lambda-ses_send-policy"
+  lambda_iam_ses_policy = "${var.resource_grp_name}-lambda-ses-send-policy"
   sns_iam_policy = "${var.resource_grp_name}-sns-policy"
 }
 
