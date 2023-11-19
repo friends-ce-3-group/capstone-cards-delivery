@@ -1,10 +1,15 @@
-import json
 import boto3
 import botocore
 import os
+import pathlib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+from botocore.exceptions import ClientError
 
 CONST_IMAGE_SRC_PREFIX = "resized/" # the prefix path in the S3 bucket for all the images to be sent
 CONST_TARGET_PATH_PREFIX = "/tmp/" # in the lambda filesystem, only this folder is writable
+CONST_SENDER_EMAIL = "gooodgreets@gmail.com"
 
 # def sns_trigger(event):
 #     client = boto3.client('sns')
@@ -45,7 +50,7 @@ def s3_bucket_get(image):
 def send_email(recipient_email):
     ses = boto3.client('ses')
     response = ses.send_email(
-        Source="gooodgreets@gmail.com",
+        Source=CONST_SENDER_EMAIL,
         Destination={'ToAddresses': [recipient_email]},
         Message={
             'Subject': {'Data': "Hello"},
@@ -53,7 +58,40 @@ def send_email(recipient_email):
         }
     )
     print("Email sent! Message ID:", response['MessageId'])
+
     return response
+
+def send_email_with_attachment(receipient_email):
+    ses = boto3.client('ses')
+
+    msg = MIMEMultipart()
+    msg['Subject'] = "Hello"
+    msg['From'] = CONST_SENDER_EMAIL
+    msg['To'] = receipient_email
+    msg.attach(MIMEText("There is a card for you"))
+
+    # Attach the file
+    attachment_filename = os.listdir(CONST_TARGET_PATH_PREFIX)[0]  # Replace with the actual filename
+    with open(pathlib.Path(CONST_TARGET_PATH_PREFIX) / attachment_filename, 'rb') as attachment_file:
+        attachment = MIMEApplication(attachment_file.read(), Name=attachment_filename)
+
+    attachment['Content-Disposition'] = f'attachment; filename="{attachment_filename}"'
+    msg.attach(attachment)
+
+    try:
+        response = ses.send_raw_email(
+            Source=CONST_SENDER_EMAIL,
+            Destinations=[receipient_email],
+            RawMessage={'Data': msg.as_string()}
+        )
+        print("Email sent! Message ID:", response['MessageId'])
+
+        return response
+
+    except ClientError as e:
+        print("Error sending email:", e)
+        return str(e)
+
 
 def friends_capstone_notification_lambda(event, context):
 
