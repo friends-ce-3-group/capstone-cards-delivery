@@ -42,6 +42,18 @@ def s3_bucket_get(image):
         return False, str(err)
         
 
+def send_email(recipient_email):
+    ses = boto3.client('ses')
+    response = ses.send_email(
+        Source="gooodgreets@gmail.com",
+        Destination={'ToAddresses': [recipient_email]},
+        Message={
+            'Subject': {'Data': "Hello"},
+            'Body': {'Text': {'Data': "There is a card for you"}}
+        }
+    )
+    print("Email sent! Message ID:", response['MessageId'])
+
 def friends_capstone_notification_lambda(event, context):
 
     response = sns_trigger(event)
@@ -59,7 +71,7 @@ def friends_capstone_notification_lambda(event, context):
 
     if success:
         print("Triggering SES")
+        send_email(event["recipientEmail"])
 
-        
 
     return response
