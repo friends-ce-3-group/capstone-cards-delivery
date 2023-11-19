@@ -21,6 +21,7 @@ locals {
   lambda_iam_role = "${var.resource_grp_name}-lambda-role"
   lambda_iam_logging_policy = "${var.resource_grp_name}-lambda-logging-policy"
   lambda_iam_s3_get_policy = "${var.resource_grp_name}-lambda-s3-get-policy"
+  lambda_iam_ses_policy = "${var.resource_grp_name}-lambda-ses_send-policy"
   sns_iam_policy = "${var.resource_grp_name}-sns-policy"
 }
 
@@ -142,13 +143,13 @@ locals {
 data "aws_iam_policy_document" "lambda_s3_get_policy_doc" {
   statement {
     actions   = [
-          "s3:ListBucket",
-          "s3:GetObject"
-        ]
+      "s3:ListBucket",
+      "s3:GetObject"
+      ]
     resources = [ 
       "arn:aws:s3:::${local.s3_bucket_name}/*",
       "arn:aws:s3:::${local.s3_bucket_name}"
-    ]
+      ]
     effect    = "Allow"
   }
 }
@@ -167,4 +168,36 @@ resource "aws_iam_policy" "lambda_s3_get_policy" {
 resource "aws_iam_role_policy_attachment" "attach_s3_get_policy" {
   role       = aws_iam_role.lambda_iam_role.name
   policy_arn = aws_iam_policy.lambda_s3_get_policy.arn
+}
+
+
+# Set up permissions to send email with Simple Email Service
+#------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "lambda_ses_policy_doc" {
+  statement {
+    actions   = [ 
+      "ses:SendEmail", 
+      "ses:SendRawEmail" 
+      ]
+    resources = [ 
+      "*" 
+      ]
+    effect    = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "lambda_ses_policy" {
+  name   = local.lambda_iam_ses_policy
+  policy = data.aws_iam_policy_document.lambda_ses_policy_doc.json
+
+  tags = {
+    name = local.lambda_iam_ses_policy
+    proj_name = var.proj_name
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ses_send_policy" {
+  role       = aws_iam_role.lambda_iam_role.name
+  policy_arn = aws_iam_policy.lambda_ses_policy.arn
 }
