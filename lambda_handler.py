@@ -93,7 +93,7 @@ def send_email_with_attachment(receipient_email):
         return str(e)
 
 
-def friends_capstone_notification_lambda(event, context):
+def ${lambda_handler_function}(event, context):
 
     # response = sns_trigger(event)
 
