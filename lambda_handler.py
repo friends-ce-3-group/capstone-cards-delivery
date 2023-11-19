@@ -1,5 +1,6 @@
 import json
 import boto3
+import botocore
 import os
 
 def sns_trigger(event):
@@ -16,26 +17,40 @@ def sns_trigger(event):
 
     return response
 
-def s3_bucket_get():
-    #s3 = boto3.client("s3")
-    
-    #for bucket in s3.list_buckets()["Buckets"]:
-    #    print(bucket["Name"])
+def s3_bucket_get(image):
+    s3_prefix = "originals/"
+    local_prefix = "tmp/"
 
-    s3res = boto3.resource('s3')
-    bucket = s3res.Bucket('${s3_image_bucket_name}')
+    image_path = s3_prefix + image
+    local_path = local_prefix + image
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket('${s3_image_bucket_name}')
     for obj in bucket.objects.all():
         print(obj.key)
+
+    print(":")
+    print(":")
+    print(":")
+    print("Trying to dl:")
+    
+    try:
+        s3.Bucket('${s3_image_bucket_name}').download_file(image_path, local_path)
+    except botocore.exceptions.ClientError as err:
+        print(str(err))
         
 
 def ${lambda_handler_function}(event, context):
 
     response = sns_trigger(event)
 
-    #print(event["recipientName"])
-    #print(event["recipientEmail"])
-    #print(event["imagePath"])
+    print("recipientName:", event["recipientName"], "\n")
+    print("recipientEmail", event["recipientEmail"], "\n")
+    print("imagePath:" , event["imagePath"], "\n")
+    print(":")
+    print(":")
+    print(":")
 
-    s3_bucket_get()
+    s3_bucket_get(event["imagePath"])
 
     return response
