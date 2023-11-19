@@ -18,14 +18,16 @@ def sns_trigger(event):
     return response
 
 def s3_bucket_get(image):
-    s3_prefix = "originals/"
-    local_prefix = "tmp/"
+    s3_prefix = ""
+    local_prefix = "/tmp/" # in the lambda filesystem, only this folder is writable
 
     image_path = s3_prefix + image
     local_path = local_prefix + image
 
+    bucket_name = '${s3_image_bucket_name}'
+
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket('${s3_image_bucket_name}')
+    bucket = s3.Bucket(bucket_name)
     for obj in bucket.objects.all():
         print(obj.key)
 
@@ -35,7 +37,7 @@ def s3_bucket_get(image):
     print("Trying to dl:")
     
     try:
-        s3.Bucket('${s3_image_bucket_name}').download_file(image_path, local_path)
+        bucket.download_file(image_path, local_path)
     except botocore.exceptions.ClientError as err:
         print(str(err))
         
