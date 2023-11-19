@@ -6,19 +6,19 @@ import os
 CONST_IMAGE_SRC_PREFIX = "resized/" # the prefix path in the S3 bucket for all the images to be sent
 CONST_TARGET_PATH_PREFIX = "/tmp/" # in the lambda filesystem, only this folder is writable
 
-def sns_trigger(event):
-    client = boto3.client('sns')
+# def sns_trigger(event):
+#     client = boto3.client('sns')
     
-    out = {} 
-    out['default'] = json.dumps(event)
+#     out = {} 
+#     out['default'] = json.dumps(event)
 
-    response = client.publish (
-        TopicArn = "${sns_topic_arn}",
-        Message = json.dumps(out),
-        MessageStructure = 'json'
-    )
+#     response = client.publish (
+#         TopicArn = "${sns_topic_arn}",
+#         Message = json.dumps(out),
+#         MessageStructure = 'json'
+#     )
 
-    return response
+#     return response
 
 def s3_bucket_get(image):
     image_path = CONST_IMAGE_SRC_PREFIX + image
@@ -53,10 +53,11 @@ def send_email(recipient_email):
         }
     )
     print("Email sent! Message ID:", response['MessageId'])
+    return response
 
 def friends_capstone_notification_lambda(event, context):
 
-    response = sns_trigger(event)
+    # response = sns_trigger(event)
 
     print("recipientName:", event["recipientName"], "\n")
     print("recipientEmail", event["recipientEmail"], "\n")
@@ -70,8 +71,10 @@ def friends_capstone_notification_lambda(event, context):
     print("---------------------------------------------------------")
 
     if success:
+    
         print("Triggering SES")
-        send_email(event["recipientEmail"])
-
-
-    return response
+        response = send_email(event["recipientEmail"])
+        return response
+    
+    else:
+        return msg
