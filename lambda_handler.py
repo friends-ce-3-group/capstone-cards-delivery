@@ -18,7 +18,7 @@ def sns_trigger(event):
     return response
 
 def s3_bucket_get(image):
-    s3_prefix = ""
+    s3_prefix = "static/css/"
     local_prefix = "/tmp/" # in the lambda filesystem, only this folder is writable
 
     image_path = s3_prefix + image
