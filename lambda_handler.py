@@ -3,6 +3,9 @@ import boto3
 import botocore
 import os
 
+CONST_IMAGE_SRC_PREFIX = "resized/" # the prefix path in the S3 bucket for all the images to be sent
+CONST_TARGET_PATH_PREFIX = "/tmp/" # in the lambda filesystem, only this folder is writable
+
 def sns_trigger(event):
     client = boto3.client('sns')
     
@@ -18,11 +21,8 @@ def sns_trigger(event):
     return response
 
 def s3_bucket_get(image):
-    s3_prefix = "static/css/"
-    local_prefix = "/tmp/" # in the lambda filesystem, only this folder is writable
-
-    image_path = s3_prefix + image
-    local_path = local_prefix + image
+    image_path = CONST_IMAGE_SRC_PREFIX + image
+    local_path = CONST_TARGET_PATH_PREFIX + image
 
     # notes: 
     # this lambda is in us-east-1, whereas friends-capstone-infra-s3-website is in us-west-2
@@ -34,19 +34,15 @@ def s3_bucket_get(image):
     bucket = s3.Bucket(bucket_name)
     for obj in bucket.objects.all():
         print(obj.key)
-
-    print(":")
-    print(":")
-    print(":")
-    print("Trying to dl:")
     
     try:
         bucket.download_file(image_path, local_path)
+        return True, None
     except botocore.exceptions.ClientError as err:
-        print(str(err))
+        return False, str(err)
         
 
-def ${lambda_handler_function}(event, context):
+def friends_capstone_notification_lambda(event, context):
 
     response = sns_trigger(event)
 
@@ -58,5 +54,10 @@ def ${lambda_handler_function}(event, context):
     print(":")
 
     s3_bucket_get(event["imagePath"])
+
+    print(":")
+    print(":")
+    print(":")
+    print(os.listdir(CONST_TARGET_PATH_PREFIX))
 
     return response
