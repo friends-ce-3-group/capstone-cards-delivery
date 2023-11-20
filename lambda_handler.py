@@ -8,6 +8,7 @@ from email.mime.application import MIMEApplication
 from botocore.exceptions import ClientError
 
 CONST_IMAGE_SRC_PREFIX = "originals/" # the prefix path in the S3 bucket for all the images to be sent
+CONST_IMAGE_SRC_PREFIX_SECONDARY = "resized/"
 CONST_TARGET_PATH_PREFIX = "/tmp/" # in the lambda filesystem, only this folder is writable
 CONST_SENDER_EMAIL = "gooodgreets@gmail.com"
 
@@ -27,6 +28,7 @@ CONST_SENDER_EMAIL = "gooodgreets@gmail.com"
 
 def s3_bucket_get(image):
     image_path = CONST_IMAGE_SRC_PREFIX + image
+    image_path_secondary = CONST_IMAGE_SRC_PREFIX_SECONDARY + image
     local_path = CONST_TARGET_PATH_PREFIX + image
 
     # notes: 
@@ -44,8 +46,12 @@ def s3_bucket_get(image):
         bucket.download_file(image_path, local_path)
         return True, None
     except botocore.exceptions.ClientError as err:
-        return False, str(err)
-        
+        try:
+            bucket.download_file(image_path_secondary, local_path)
+            return True, None
+        except botocore.exceptions.ClientError as err:
+            return False, str(err)
+
 
 def send_email(recipient_email):
     ses = boto3.client('ses')
@@ -115,4 +121,5 @@ def ${lambda_handler_function}(event, context):
         return response
     
     else:
+        print("Error:", msg)
         return msg
