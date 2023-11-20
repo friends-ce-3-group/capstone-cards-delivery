@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from botocore.exceptions import ClientError
 
-CONST_IMAGE_SRC_PREFIX = "resized/" # the prefix path in the S3 bucket for all the images to be sent
+CONST_IMAGE_SRC_PREFIX = "originals/" # the prefix path in the S3 bucket for all the images to be sent
 CONST_TARGET_PATH_PREFIX = "/tmp/" # in the lambda filesystem, only this folder is writable
 CONST_SENDER_EMAIL = "gooodgreets@gmail.com"
 
