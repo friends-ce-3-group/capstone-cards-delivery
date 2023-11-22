@@ -119,7 +119,12 @@ def ${lambda_handler_function}(event, context):
         print("Triggering SES")
         response = send_email_with_attachment(event["recipientEmail"])
         print("response:", response)
-        print("SUCCESS / SENDCARD / SES")
+
+        if "Email sent!" in response:
+            print("SUCCESS / SENDCARD / SES")
+        else:
+            print("FAILURE / SENDCARD / SES")
+            
         return response
     
     else:
