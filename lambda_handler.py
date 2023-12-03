@@ -7,9 +7,12 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from botocore.exceptions import ClientError
 
-CONST_IMAGE_SRC_PREFIX = "originals/" # the prefix path in the S3 bucket for all the images to be sent
-CONST_IMAGE_SRC_PREFIX_SECONDARY = "resized/"
-CONST_TARGET_PATH_PREFIX = "/tmp/" # in the lambda filesystem, only this folder is writable
+CONST_IMAGE_SRC_PREFIX              = "originals/" # the prefix path in the S3 bucket for all the images to be sent
+CONST_IMAGE_SRC_PREFIX_SECONDARY    = "resized/"
+CONST_TARGET_PATH_PREFIX            = "/tmp/" # in the lambda filesystem, only this folder is writable
+CONST_HTTP_KEY                      = "HTTPStatusCode"
+CONST_HTTP_SUCCESS                  = 200
+
 CONST_SENDER_EMAIL = "gooodgreets@gmail.com"
 
 # def sns_trigger(event):
@@ -120,7 +123,13 @@ def ${lambda_handler_function}(event, context):
         response = send_email_with_attachment(event["recipientEmail"])
         print("response:", response)
 
-        if "Email sent!" in response:
+        email_send_success = False
+
+        if CONST_HTTP_KEY in response:
+            if response[CONST_HTTP_KEY] == CONST_HTTP_SUCCESS:
+                email_send_success = True
+
+        if email_send_success:
             print("SUCCESS / SENDCARD / SES")
         else:
             print("FAILURE / SENDCARD / SES")
