@@ -12,6 +12,7 @@ CONST_IMAGE_SRC_PREFIX_SECONDARY    = "resized/"
 CONST_TARGET_PATH_PREFIX            = "/tmp/" # in the lambda filesystem, only this folder is writable
 CONST_HTTP_KEY                      = "HTTPStatusCode"
 CONST_HTTP_SUCCESS                  = 200
+CONST_HTTP_FAILURE                  = 500
 
 CONST_SENDER_EMAIL = "gooodgreets@gmail.com"
 
@@ -87,6 +88,8 @@ def send_email_with_attachment(receipient_email):
     attachment['Content-Disposition'] = f'attachment; filename="{attachment_filename}"'
     msg.attach(attachment)
 
+    response = {}
+
     try:
         response = ses.send_raw_email(
             Source=CONST_SENDER_EMAIL,
@@ -95,11 +98,16 @@ def send_email_with_attachment(receipient_email):
         )
         print("Email sent! Message ID:", response['MessageId'])
 
-        return response
-
     except ClientError as e:
         print("Error sending email:", e)
-        return str(e)
+
+        response = {}
+        response["ResponseMetadata"] = {"error message" : str(e)}
+        response["ResponseMetadata"][CONST_HTTP_KEY] = CONST_HTTP_FAILURE
+
+        print("ERROR::: Email WAS NOT SENT! Message ID:", response['MessageId'])
+
+    return response
 
 
 def ${lambda_handler_function}(event, context):
@@ -125,10 +133,8 @@ def ${lambda_handler_function}(event, context):
 
         email_send_success = False
 
-        print("response[CONST_HTTP_KEY]: ", response[CONST_HTTP_KEY])
-
-        if CONST_HTTP_KEY in response:
-            if response[CONST_HTTP_KEY] == CONST_HTTP_SUCCESS:
+        if "ResponseMetadata" in response:
+            if response["ResponseMetadata"][CONST_HTTP_KEY] == CONST_HTTP_SUCCESS:
                 email_send_success = True
 
         if email_send_success:
