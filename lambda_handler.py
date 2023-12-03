@@ -125,6 +125,8 @@ def ${lambda_handler_function}(event, context):
 
         email_send_success = False
 
+        print("response[CONST_HTTP_KEY]: ", response[CONST_HTTP_KEY])
+
         if CONST_HTTP_KEY in response:
             if response[CONST_HTTP_KEY] == CONST_HTTP_SUCCESS:
                 email_send_success = True
